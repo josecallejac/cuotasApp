@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 class CasaApuestas(models.Model):
-    """Modelo para representar una casa de apuestas"""
+    """Modelo para representar una casa de apuestassss"""
     nombre = models.CharField(max_length=100, unique=True)
     logo = models.URLField(blank=True, null=True, help_text="URL del logo")
     url = models.URLField(help_text="Sitio web de la casa de apuestas")
