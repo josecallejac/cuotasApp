@@ -1,0 +1,139 @@
+{% extends 'comparador/base.html' %}
+
+{% block title %}{{ evento }} - Comparador de Cuotas{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'comparador:index' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'comparador:eventos_por_deporte' evento.deporte.slug %}">{{ evento.deporte.nombre }}</a></li>
+        <li class="breadcrumb-item active">{{ evento }}</li>
+    </ol>
+</nav>
+
+<!-- Header del Evento -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-primary me-2">
+                        <i class="{{ evento.deporte.icono }}"></i> {{ evento.deporte.nombre }}
+                    </span>
+                    {% if evento.liga %}
+                    <span class="badge bg-secondary">
+                        <i class="fas fa-trophy"></i> {{ evento.liga }}
+                    </span>
+                    {% endif %}
+                </div>
+                <h2 class="mb-3">
+                    {{ evento.equipo_local }}
+                    <span class="text-muted">vs</span>
+                    {{ evento.equipo_visitante }}
+                </h2>
+                <p class="text-muted mb-0">
+                    <i class="far fa-calendar"></i> {{ evento.fecha_evento|date:"d/m/Y H:i" }}
+                    {% if evento.pais %}
+                    | <i class="fas fa-map-marker-alt"></i> {{ evento.pais }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                {% if evento.esta_activo %}
+                <span class="badge bg-success" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                    <i class="fas fa-check-circle"></i> Evento Activo
+                </span>
+                {% else %}
+                <span class="badge bg-danger" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                    <i class="fas fa-times-circle"></i> Evento Finalizado
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comparación de Cuotas -->
+{% if cuotas_por_tipo %}
+    {% for tipo_codigo, tipo_data in cuotas_por_tipo.items %}
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-chart-bar"></i> {{ tipo_data.nombre }}
+            </h5>
+        </div>
+        <div class="card-body">
+            {% for opcion, cuotas in tipo_data.opciones.items %}
+            <div class="mb-4">
+                <h6 class="text-primary mb-3">
+                    <i class="fas fa-arrow-right"></i> {{ opcion }}
+                </h6>
+                <div class="row">
+                    {% for cuota in cuotas %}
+                    <div class="col-md-4 col-lg-3 mb-3">
+                        <div class="card h-100 {% if cuota.id == mejores_cuotas|dict_get:tipo_codigo|add:'_'|add:opcion|dict_get:'id' %}border-success{% endif %}">
+                            <div class="card-body text-center">
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    {{ cuota.casa_apuestas.nombre }}
+                                </h6>
+                                <div class="cuota-badge {% if cuota.id == mejores_cuotas|dict_get:tipo_codigo|add:'_'|add:opcion|dict_get:'id' %}cuota-mejor{% else %}cuota-normal{% endif %}">
+                                    {{ cuota.valor }}
+                                </div>
+                                {% if cuota.valor_anterior %}
+                                <small class="{% if cuota.tendencia == 'subida' %}tendencia-subida{% elif cuota.tendencia == 'bajada' %}tendencia-bajada{% endif %}">
+                                    {% if cuota.tendencia == 'subida' %}
+                                        <i class="fas fa-arrow-up"></i> +{{ cuota.cambio_cuota }}
+                                    {% elif cuota.tendencia == 'bajada' %}
+                                        <i class="fas fa-arrow-down"></i> {{ cuota.cambio_cuota }}
+                                    {% endif %}
+                                </small>
+                                {% endif %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="far fa-clock"></i> {{ cuota.fecha_actualizacion|date:"H:i" }}
+                                    </small>
+                                </div>
+                                {% if cuota.casa_apuestas.url %}
+                                <a href="{{ cuota.casa_apuestas.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                    <i class="fas fa-external-link-alt"></i> Apostar
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if not forloop.last %}<hr>{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        No hay cuotas disponibles para este evento en este momento.
+    </div>
+{% endif %}
+
+<!-- Información Adicional -->
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-info-circle"></i> Información</h5>
+        <p class="text-muted mb-0">
+            Las cuotas se actualizan constantemente. Los valores mostrados pueden variar. 
+            Siempre verifica las cuotas en el sitio web de la casa de apuestas antes de realizar tu apuesta.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh cada 60 segundos
+    setTimeout(function() {
+        location.reload();
+    }, 60000);
+</script>
+{% endblock %}

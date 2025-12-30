@@ -1,0 +1,149 @@
+{% extends 'comparador/base.html' %}
+
+{% block title %}Inicio - Comparador de Cuotas{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card stats-card p-4">
+            <div class="row text-center">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h2 class="display-4"><i class="fas fa-calendar-alt"></i></h2>
+                    <h3>{{ total_eventos }}</h3>
+                    <p class="mb-0">Eventos Disponibles</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h2 class="display-4"><i class="fas fa-building"></i></h2>
+                    <h3>{{ total_casas }}</h3>
+                    <p class="mb-0">Casas de Apuestas</p>
+                </div>
+                <div class="col-md-4">
+                    <h2 class="display-4"><i class="fas fa-chart-line"></i></h2>
+                    <h3>En Vivo</h3>
+                    <p class="mb-0">Comparación en Tiempo Real</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deportes Disponibles -->
+{% if deportes %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3"><i class="fas fa-futbol"></i> Deportes Disponibles</h4>
+        <div class="d-flex flex-wrap gap-2">
+            {% for deporte in deportes %}
+            <a href="{% url 'comparador:eventos_por_deporte' deporte.slug %}" class="btn btn-outline-primary deporte-badge">
+                {% if deporte.icono %}<i class="{{ deporte.icono }}"></i>{% endif %}
+                {{ deporte.nombre }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Eventos Próximos -->
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4><i class="fas fa-calendar-check"></i> Próximos Eventos</h4>
+            <a href="{% url 'comparador:mejores_cuotas' %}" class="btn btn-primary">
+                <i class="fas fa-trophy"></i> Ver Mejores Cuotas
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% if eventos %}
+        {% for evento in eventos %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card evento-card h-100">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary">
+                            <i class="{{ evento.deporte.icono }}"></i> {{ evento.deporte.nombre }}
+                        </span>
+                        <small class="text-muted">
+                            <i class="far fa-clock"></i> {{ evento.fecha_evento|date:"d/m H:i" }}
+                        </small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-3">
+                        {{ evento.equipo_local }} <br>
+                        <small class="text-muted">vs</small><br>
+                        {{ evento.equipo_visitante }}
+                    </h5>
+                    {% if evento.liga %}
+                    <p class="text-center text-muted mb-2">
+                        <i class="fas fa-trophy"></i> {{ evento.liga }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if evento.cuotas.all %}
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            {{ evento.cuotas.all|length }} cuotas disponibles
+                        </small>
+                    </div>
+                    {% else %}
+                    <div class="text-center mt-3">
+                        <small class="text-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Sin cuotas disponibles
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a href="{% url 'comparador:evento_detalle' evento.id %}" class="btn btn-primary w-100">
+                        <i class="fas fa-chart-bar"></i> Ver Comparación
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> 
+                No hay eventos disponibles en este momento.
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Información adicional -->
+<div class="row mt-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h2 class="text-primary"><i class="fas fa-sync-alt"></i></h2>
+                <h5>Actualización Constante</h5>
+                <p class="text-muted">Las cuotas se actualizan en tiempo real para ofrecerte la información más precisa.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h2 class="text-success"><i class="fas fa-search-dollar"></i></h2>
+                <h5>Encuentra las Mejores Cuotas</h5>
+                <p class="text-muted">Compara cuotas de múltiples casas de apuestas en un solo lugar.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h2 class="text-warning"><i class="fas fa-trophy"></i></h2>
+                <h5>Maximiza tus Ganancias</h5>
+                <p class="text-muted">Identifica rápidamente las cuotas más altas para tus apuestas deportivas.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'comparador/base.html' %}
+
+{% block title %}Casas de Apuestas - Comparador de Cuotas{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-building"></i> Casas de Apuestas</h2>
+        <p class="text-muted">Todas las casas de apuestas disponibles en nuestra plataforma.</p>
+    </div>
+</div>
+
+{% if casas %}
+<div class="row">
+    {% for casa in casas %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                {% if casa.logo %}
+                <img src="{{ casa.logo }}" alt="{{ casa.nombre }}" class="img-fluid mb-3" style="max-height: 80px;">
+                {% else %}
+                <h2 class="text-primary mb-3"><i class="fas fa-building"></i></h2>
+                {% endif %}
+                <h5 class="card-title">{{ casa.nombre }}</h5>
+                
+                <div class="my-3">
+                    <span class="badge bg-info">
+                        <i class="fas fa-chart-line"></i> {{ casa.total_cuotas }} cuotas
+                    </span>
+                    {% if casa.activa %}
+                    <span class="badge bg-success">
+                        <i class="fas fa-check-circle"></i> Activa
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary">
+                        <i class="fas fa-pause-circle"></i> Inactiva
+                    </span>
+                    {% endif %}
+                </div>
+                
+                {% if casa.url %}
+                <a href="{{ casa.url }}" target="_blank" class="btn btn-primary w-100">
+                    <i class="fas fa-external-link-alt"></i> Visitar Sitio Web
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-footer text-center text-muted">
+                <small>
+                    <i class="far fa-calendar"></i> Desde {{ casa.fecha_creacion|date:"d/m/Y" }}
+                </small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info text-center">
+    <i class="fas fa-info-circle"></i>
+    No hay casas de apuestas registradas en este momento.
+</div>
+{% endif %}
+
+<!-- Información Adicional -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-info-circle"></i> Información</h5>
+                <p class="mb-0">
+                    Actualizamos constantemente las cuotas de todas las casas de apuestas para ofrecerte 
+                    la mejor comparación posible. Si ves una casa de apuestas que no está en nuestra lista, 
+                    contáctanos para agregarla.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

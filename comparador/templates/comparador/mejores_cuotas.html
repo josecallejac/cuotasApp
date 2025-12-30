@@ -1,0 +1,84 @@
+{% extends 'comparador/base.html' %}
+
+{% block title %}Mejores Cuotas - Comparador de Cuotas{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-trophy"></i> Mejores Cuotas Disponibles</h2>
+        <p class="text-muted">Encuentra las cuotas más altas para cada evento y opción de apuesta.</p>
+    </div>
+</div>
+
+<!-- Selector de Tipo de Cuota -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Selecciona el tipo de apuesta</h5>
+        <div class="d-flex flex-wrap gap-2">
+            {% for tipo in tipos_cuota %}
+            <a href="?tipo={{ tipo.codigo }}" class="btn {% if tipo.id == tipo_cuota_actual.id %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                {{ tipo.nombre }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Mejores Cuotas -->
+{% if eventos_cuotas %}
+    {% for item in eventos_cuotas %}
+    <div class="card evento-card mb-3">
+        <div class="card-header bg-white">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-0">
+                        <span class="badge bg-primary me-2">
+                            <i class="{{ item.evento.deporte.icono }}"></i> {{ item.evento.deporte.nombre }}
+                        </span>
+                        {{ item.evento }}
+                    </h5>
+                    <small class="text-muted">
+                        <i class="far fa-calendar"></i> {{ item.evento.fecha_evento|date:"d/m/Y H:i" }}
+                        {% if item.evento.liga %}
+                        | <i class="fas fa-trophy"></i> {{ item.evento.liga }}
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="{% url 'comparador:evento_detalle' item.evento.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-chart-bar"></i> Ver Detalle
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for opcion, cuota in item.cuotas.items %}
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <h6 class="text-muted mb-2">{{ opcion }}</h6>
+                        <div class="cuota-badge cuota-mejor mb-2">
+                            {{ cuota.valor }}
+                        </div>
+                        <small class="text-muted d-block">
+                            {{ cuota.casa_apuestas.nombre }}
+                        </small>
+                        {% if cuota.casa_apuestas.url %}
+                        <a href="{{ cuota.casa_apuestas.url }}" target="_blank" class="btn btn-sm btn-outline-success mt-2">
+                            <i class="fas fa-external-link-alt"></i> Apostar
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle"></i>
+        No hay cuotas disponibles para el tipo seleccionado.
+    </div>
+{% endif %}
+{% endblock %}
